@@ -1,18 +1,26 @@
 import './styleHome.css';
 import { FromIA } from '../Componentes/FormIA/FormIA';
-import {styled,keyframes} from 'styled-components';
+import {styled} from 'styled-components';
 import { useState } from 'react';
 import { useEffect } from 'react';
-
+import { showUp,showUpRigth } from '../animation/Mostrar';
 
 export function Home(){
     const[scroll, setScroll] = useState(0);
+    
     useEffect(()=>{
-
+        let c = 0;
         window.addEventListener('scroll',(e)=>{
-            
-            setScroll(window.scrollY);
-        })
+          
+            if(window.scrollY>1100 && c === 0){
+                c= 1;
+                setScroll(
+                    <CompAnimationDiv className='contain-form'>
+                              <FromIA/>
+                      </CompAnimationDiv>);
+            }
+         })
+        
         
     },[])
    
@@ -30,7 +38,7 @@ export function Home(){
                             <div className="cont-center">
                             <h2>¿Que hacemos?</h2>
                             <p>
-                                El <b>Instituto Tecnologico Cordillera</b> con el uso de la inteligencia artificial le da la facilidad a las 
+                                El <b>Instituto Tecnologico Cordillera</b> con el uso de la inteligencia artificial, le da la facilidad a las 
                                 personas que deseen comprar una casa, dandoles la mejor opcion para su bolsillo.
                             </p>
                             </div>
@@ -44,32 +52,12 @@ export function Home(){
                     </div>
             </div>
         
-          {scroll<1100?undefined:
-          <CompAnimationDiv className='contain-form'>
-                    <FromIA/>
-            </CompAnimationDiv>}
+          {scroll}
            
         </div>
     )
 }
-const showUp = keyframes`
-   from{
-    opacity: 0;
-     top:-200px
-   }
-   to{
-    top:0;
-   }
-`
-const showUpRigth = keyframes`
-   from{
-    opacity: 0;
-     left:-200px;
-   }
-   to{
-    left:10%;
-   }
-`
+
 const CompAnimationDiv = styled.div`
     position:relative;
     animation:${showUp} 2s forwards;
