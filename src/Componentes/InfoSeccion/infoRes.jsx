@@ -1,57 +1,47 @@
 import styled from "styled-components";
 import { type } from "../../animation/Mostrar";
 import { useEffect, useState } from "react";
-import { formatInfo } from "../FormIA/formats";
 import icMoneda from '../../assets/pila-de-monedas.png'
-export function InfoSeccion(props){
-    const info = formatInfo(props.info)
+import { barrios } from "../FormIA/FormIA";
 
-    useEffect(()=>{
-        document.documentElement.scrollTop = 2700;
-    },[])
+export function InfoSeccion(props){
+
+    
     return(
     <InfoSecc>
         <br />
         <br />
         <br />
-        <h3>Precio Aprox:</h3>
-        <SpanAnimation $nch = {info.precio.length} > $ {info.precio}</SpanAnimation>
+        <ContTitle>
+            <div className="contPrevInfo uno">
+            <h3>Precio Aprox:</h3>
+            <SpanAnimation $nch = {props.info.precio.precioModelo.length}> $ {props.info.precio.precioModelo}</SpanAnimation>
+            </div>
+            <div className="contPrevInfo dos">
+                <p><b>Habitaciones:</b> {props.info.cliente.habitaciones}</p>
+                <p><b>Parqueaderos:</b> {props.info.cliente.habitaciones}</p>
+                <p><b>Acabados:</b> {props.info.cliente.habitaciones}</p>
+                <p><b>Sector:</b> {barrios[Number(props.info.cliente.sector)]}</p>
+                <p><b>Area:</b> {props.info.cliente.area}</p>
+            </div>
+        </ContTitle>
         <br />
         <br /> 
-        <h2>Terrenos </h2>
-        <ContCard >
-
-            {
-                props.infoCas?.map((lote,i)=>(
-                    <div className="contain-info" key={i}>
-                        <div className="title-name">
-                            <p>{lote.descripcion}</p>
-                        </div>
-                        <div className="details-terreno">
-                            <p><b>Area :</b> {lote.area} </p>
-                            <p><b>Localizacion :</b> {lote.localizacion} </p>
-                        </div>
-                    
-                </div>
-                ))
-            }
-        </ContCard>
     </InfoSecc>
     )
 }
 
 const InfoSecc = styled.div`
     width: 58%;
-    height: 640px;
-   
+    min-height: 640px;
     margin: 12px;
-    background: #2e3329;
-    color: #FFFFFF;
     & h3{
         text-align: center;
         font-size: 30px;
     }
-
+    @media  (width < 1100px) {
+        width: 100%;
+    }
 `
 const SpanAnimation  = styled.span`
     display: block;
@@ -64,43 +54,33 @@ const SpanAnimation  = styled.span`
     margin:auto;
     animation: ${type}  2s  steps(${p => p.$nch+2});
 `
-const ContCard = styled.div`
-    position: relative;
+const ContTitle = styled.div`
     width: 100%;
-    height: 402px;
-    overflow: auto;
-    
-    .contain-info{
-        width: 100%;
-        min-height: 100px;
-        border-bottom: 1px solid #4C5443;
+    min-height: 300px;
+    .contPrevInfo{
         margin: auto;
-        padding: 10px 0 0 20px;
-        transition: .9s;
-        
-        .title-name{
-            & p{
-                width: 50%;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                text-transform: capitalize;
-                font-size: 25px;
-            }
-           
-        }
-        .details-terreno{
-            display: flex;
-            & p{
-                margin-right: 20px;
-                font-size: 15px;
-            }
-        }
-        & b{
-            color: #c19434;
+    }
+    .dos{
+        width: 80%;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+
+        & p{
+            width: 40%;
+            font-size: 1.5em;
+            margin: 20px;
         }
     }
-    .contain-info:hover{
-        background:#4C5443 ;
+    @media  (width < 1100px) {
+
+      .contPrevInfo{
+        width: 100%;
+        & p{
+            padding-top: 20px;
+            
+        }
     }
+    }
+
 `

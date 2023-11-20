@@ -4,7 +4,8 @@ import styled from 'styled-components'
 import { InfoSeccion } from '../InfoSeccion/infoRes';
 import { showUp } from '../../animation/Mostrar';
 import { lugares } from '../../data/url_sectores';
-
+import { buscarcotizacion } from '../../services/servicioModelo';
+import { formatResp } from '../../utilities/formatResp';
 export function FromIA() {
 
     const [map, setMap] = useState("https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d255347.02338043865!2d-78.59534800791202!3d-0.186250226576769!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91d59a4002427c9f%3A0x44b991e158ef5572!2sQuito!5e0!3m2!1ses!2sec!4v1695515742363!5m2!1ses!2sec");
@@ -13,45 +14,38 @@ export function FromIA() {
     const[ mensajE, setMensajeE] = useState({'state':false,'mess':''})
     const handelChangeForm = (e) =>{
         if(e.target.name == 'Sector'){
+            
             setMap(lugares[e.target.value])
         }
-        setForm(
-            {
+        if(e.target.name == 'metros'){
+            if(e.target.value < '0'){
+                console.log('soy negaativo')
+                e.target.value = e.target.value*'-1'
+            }else  if(e.target.value == '0') {
+                e.target.value = '1'
+            }
+        }
+        
+        
+        setForm({
                 ...form,
                 [e.target.name]: e.target.value
-            }
-        )
+            })
     }
 
 
-    const enviar =  async (e) =>{
+    const enviar = async  (e) =>{
         e.preventDefault()
-     
-        if(Object.entries(form).length!==0){
-            const url = `http://127.0.0.1:5000/buscar/${form?.Habitaciones}/${form?.parqueaderos}/${form?.TipoAcabados}/${form?.Sector}`
-            await fetch(url,
-                {   
-                    method:'POST',
-                    headers:{
-                        'Content-Type': 'application/json'
-                    }
-                }
-            ).then(res => res.json()).then(
-                (respuesta) =>{
-                    if(respuesta?.estado==='500'){
-                        setMensajeE({'state':true,'mess':respuesta.mensaje})
-                        setInfoRes(null)
-                    }else{
-                        setMensajeE({'state':false,'mess':''})
-                        setInfoRes(respuesta)
-                    }
-                   
-                }
-            )
-        }else{
-            setMensajeE({'state':true,'mess':'Seleccione los campos requeridos!'})
+        const stateForm = Object.entries(form).length
+        if(stateForm === 6){
+            const res = await buscarcotizacion(form);
+             setInfoRes(formatResp(res))
+             setMensajeE({'state':false,'mess':''})
+        }else if(stateForm === 0){
+            setMensajeE({'state':true,'mess':'Seleccione los campos requeridos'})
+        }else if(stateForm < 6){
+            setMensajeE({'state':true,'mess':'Faltan campos por seleccionar'})
         }
-       
 
     }
 
@@ -70,29 +64,44 @@ export function FromIA() {
                 </div>
 
                 <div className='inputs-cont'>
-                    <h1>IA</h1>
+                    <h1>Cotiza tu hogar</h1>
                     <div className='con-input'>
                         <select name="Habitaciones" id="habitaciones" className="input-s" onChange={handelChangeForm}>
-                            <option value="" >Numero el de habitaciones</option>
-                            <option value="2">2 habitaciones</option>
-                            <option value="3">3 habitaciones</option>   
-                            <option value="4">4 habitaciones</option>
+                            <option value="" >Habitaciones</option>
                             <option value="1">Una Suite</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>   
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
                         </select>
                     </div>
                     <div className='con-input'>
                         <select name="parqueaderos" id="Parqueaderos" className="input-s" onChange={handelChangeForm}>
-                            <option value="" >Numero el de parquaderos</option>
-                            <option value="1">1 parquadero</option>
-                            <option value="2">2 parquaderos</option>
-                            <option value="3">3 parquaderos</option>
-                            <option value="4">4 parquaderos</option>
-                            <option value="5">5 parquaderos</option>
+                            <option value="" >Parquaderos</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
                         </select>
                     </div>
                     <div className='con-input'>
+                        <select name="banios" id="banios" className="input-s" onChange={handelChangeForm}>
+                            <option value="" >Baños (mas 1/2 medio baño)</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+                    <div className='con-input'>
+                        <input className='input-s' name='metros' type="number" placeholder='m&sup2;' onChange={handelChangeForm}/>
+                    </div>
+                    <div className='con-input'>
                         <select className='input-s' name="TipoAcabados" onChange={handelChangeForm}>
-                            <option   >Tipo de acabado</option>
+                            <option   >Acabado</option>
                             <option value="800" >Gama Alta </option>
                             <option value="400" >Gama Media </option>
                             <option value="300" >Económico</option>
@@ -102,10 +111,10 @@ export function FromIA() {
                     
                     <div className='con-input'>
                         <select className='input-s' name="Sector"  onChange={handelChangeForm} >
-                            <option value="0" >Seleccione un sector en Quito</option>
+                            <option value="0" >Sector (Quito)</option>
                             {
                                 barrios.map((barrio, i)=>(
-                                    <option key={i} value={barrio}>{barrio}</option>
+                                    <option key={i} value={i}>{barrio}</option>
                                 ))
                             }
 
@@ -117,14 +126,14 @@ export function FromIA() {
                     </div>
                 </div>
             </form>
-           {infoResp!==null?               
+                {infoResp!==null?
             <ContenedorMapa>
                 <h1 style={{ textAlign: 'center' }}>Resultados de tu consulta!
                 </h1>
-                <iframe src={map}   loading="lazy" ></iframe>
-                <InfoSeccion info = {infoResp?.informacionAdicional} infoCas ={infoResp?.infoCasas}/>
+               <iframe src={map}   loading="lazy" ></iframe>
+                <InfoSeccion info = {infoResp}/>
             </ContenedorMapa>
-            :undefined}  
+         :undefined}
         </div>
     )
 };
@@ -161,24 +170,19 @@ const ContenedorMapa = styled.div`
     }
 `;
 const barrios = [
-    'Cumbayá',
-    'Puembo',
-    'Carcelén',
-    'El Batán',
-    'Bellavista',
-    'González Suárez',
-    'Guápulo',
-    'Quito Tenis',
-    'Iñaquito',
-    'San Carlos',
-    'Mena del Hierro',
-    'El Condado',
-    'Cotocollao',
-    'Comité del Pueblo',
-    'La Bota',
-    'Ponceano',
-    'Tumbaco',
-    'El Inca',
-    'La Luz',
     'Pomasqui',
+    'El Batán',
+     'Iñaquito Alto', 
+     'San Carlos', 
+     'Ponceano',  
+     'La Luz',
+     'Carcelén', 
+     "Bellavista",
+     "Guápulo", 
+     "González Suárez",
+     "Quito Tenis", 
+     "Puembo",
+     "Cumbayá"
 ];
+
+export {barrios}

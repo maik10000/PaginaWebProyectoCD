@@ -6,31 +6,31 @@ import { useEffect } from 'react';
 import { showUp,showUpRigth } from '../animation/Mostrar';
 
 export function Home(){
-    const[scroll, setScroll] = useState(0);
+    const[scroll, setScroll] = useState();
     
     useEffect(()=>{
         let c = 0;
         window.addEventListener('scroll',(e)=>{
-          
-            if(window.scrollY>1100 && c === 0){
+            if(window.scrollY>100 && c === 0){
                 c= 1;
                 setScroll(
-                    <CompAnimationDiv className='contain-form'>
-                              <FromIA/>
-                      </CompAnimationDiv>);
+                    <CompAnimationDiv2 className='titulo'>
+                    <h1>Cotiza la casa de tus sueños.</h1>
+                    <p>Bienvenido a nuestra plataforma revolucionaria de cotización de viviendas impulsada por inteligencia artificial. Sabemos que tu hogar es una parte fundamental de tu vida y, por lo tanto, calcular su valor de manera precisa es esencial.</p>
+                </CompAnimationDiv2>);
             }
-         })
+         },{passive:true})
         
         
     },[])
    
     return(
         <div className="Home">
+            <CompAnimationDiv className='contain-form'>
+                              <FromIA/>
+                      </CompAnimationDiv>
             <div className='portada' >
-                <CompAnimationDiv2 className='titulo'>
-                    <h1>Encuentra  la casa de tus sueños.</h1>
-                    <p>Bienvenido a nuestra plataforma revolucionaria de cotización de viviendas impulsada por inteligencia artificial. Sabemos que tu hogar es una parte fundamental de tu vida y, por lo tanto, calcular su valor de manera precisa es esencial.</p>
-                </CompAnimationDiv2>
+                {scroll}
             </div>
             <div className='cont-info'>
                     <div className="cont-info2">
@@ -51,8 +51,6 @@ export function Home(){
                         </div>
                     </div>
             </div>
-        
-          {scroll}
            
         </div>
     )
